@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حكاية أثر | منصة الهوية المصرية والسياحة التفاعلية</title>
+    <style>
+        :root {
+            --gold: #c59b27;
+            --dark-blue: #1a2a44;
+            --sand: #f9f5eb;
+            --terracotta: #b85d3b;
+            --card: #ffffff;
+            --text: #2c2c2c;
+        }
+        * { box-sizing: border-box; font-family: Tahoma, Arial, sans-serif; }
+        body { margin: 0; background: var(--sand); color: var(--text); }
+        header {
+            background: linear-gradient(135deg, var(--dark-blue), #2c436b);
+            color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 4px solid var(--gold);
+        }
+        header h1 { margin: 0; font-size: 1.5rem; color: var(--gold); }
+        .badge { background: rgba(197, 155, 39, 0.25); border: 1px solid var(--gold); color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 0.9rem; }
+        .container { max-width: 1100px; margin: 20px auto; padding: 0 15px; }
+        .card { background: var(--card); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 3px 10px rgba(0,0,0,0.07); }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+        input, select, textarea, button {
+            width: 100%; padding: 11px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem;
+        }
+        button {
+            background: var(--dark-blue); color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.2s;
+        }
+        button:hover { opacity: 0.9; }
+        .btn-gold { background: var(--gold); color: #1a2a44; }
+        .btn-terra { background: var(--terracotta); color: white; }
+
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav-tabs button { width: auto; padding: 10px 20px; }
+
+        .item-card {
+            border: 1px solid #e6dcc8; border-radius: 10px; padding: 15px; background: #fffdf9;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .item-tag {
+            display: inline-block; padding: 4px 10px; border-radius: 15px; font-size: 0.8rem;
+            background: #f0e6d2; color: var(--dark-blue); font-weight: bold; margin-bottom: 8px;
+        }
+        .stat-box { text-align: center; padding: 15px; border-radius: 10px; background: #f4efe4; border-bottom: 4px solid var(--gold); }
+        .stat-box h2 { margin: 5px 0; color: var(--dark-blue); font-size: 1.8rem; }
+
+        .quiz-option {
+            display: block; text-align: right; background: #f4f6f9; color: var(--text);
+            border: 1px solid #d0d7de; margin: 8px 0; padding: 12px;
+        }
+        .quiz-option:hover { background: #e2e8f0; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: right; }
+        th { background: #f4efe4; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>🏛️ حكاية أثر (Hekayet Athar)</h1>
+        <small>منصة رقمية لاستكشاف الهوية المصرية، الآثار، والحرف التراثية</small>
+    </div>
+    <div id="userInfo" class="hidden">
+        <span class="badge" id="userBadge"></span>
+        <button type="button" onclick="logout()" style="width:auto; padding:6px 14px; background:#c0392b; margin-right:8px;">خروج</button>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- 1. شاشة تسجيل الدخول وإدارة الصلاحيات -->
+    <div id="loginSection" class="card" style="max-width: 480px; margin: 40px auto;">
+        <h2 style="text-align:center; color:var(--dark-blue);">مرحباً بك في بوابة الحضارة المصرية</h2>
+        <p style="text-align:center; color:#666;">اختر نوع الحساب لتجربة نظام الصلاحيات (RBAC)</p>
+        <label>الاسم:</label>
+        <input type="text" id="usernameInput" value="تسنيم محمود">
+        <label>نوع الحساب (الصلاحية):</label>
+        <select id="roleSelect">
+            <option value="visitor">زائر / مستكشف (Visitor)</option>
+            <option value="admin">مدير المحتوى والأرشيف (Admin)</option>
+        </select>
+        <button type="button" class="btn-gold" onclick="login()">ابدأ الرحلة</button>
+    </div>
+
+    <!-- 2. واجهة الزائر / المستكشف -->
+    <div id="visitorSection" class="hidden">
+        <div class="nav-tabs">
+            <button type="button" onclick="switchTab('exploreTab')">🗺️ استكشف الآثار والحرف</button>
+            <button type="button" class="btn-terra" onclick="switchTab('quizTab')">🎯 اختبر معلوماتك التراثية</button>
+        </div>
+
+        <!-- تبويب الاستكشاف -->
+        <div id="exploreTab">
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <h3>🔍 دليل المعالم والحرف التراثية في مصر</h3>
+                    <select id="categoryFilter" onchange="renderItems()" style="width:auto; min-width:200px;">
+                        <option value="all">عرض الكل (آثار وحرف)</option>
+                        <option value="monument">معالم أثرية</option>
+                        <option value="craft">حرف تراثية يدوية</option>
+                    </select>
+                </div>
+                <div class="grid-3" id="itemsGrid" style="margin-top:15px;"></div>
+            </div>
+        </div>
+
+        <!-- تبويب الاختبار التفاعلي -->
+        <div id="quizTab" class="card hidden">
+            <h3>🎯 تحدي الهوية المصرية (التعلم باللعب - Gamification)</h3>
+            <p>أجب عن الأسئلة التالية لترفع مستواك كـ "مستكشف للتراث المصري":</p>
+            <div id="quizContainer"></div>
+            <div id="quizResult" class="hidden" style="margin-top:15px; padding:15px; background:#d4edda; border-radius:8px; font-weight:bold;"></div>
+        </div>
+    </div>
+
+    <!-- 3. واجهة مدير النظام (Admin) -->
+    <div id="adminSection" class="hidden">
+        <div class="card">
+            <h3>🛠️ لوحة تحكم مدير الأرشيف (Admin Dashboard)</h3>
+            <div class="grid-3">
+                <div class="stat-box">
+                    <small>إجمالي العناصر في قاعدة البيانات</small>
+                    <h2 id="statTotalItems">0</h2>
+                </div>
+                <div class="stat-box">
+                    <small>عدد المعالم الأثرية</small>
+                    <h2 id="statMonuments">0</h2>
+                </div>
+                <div class="stat-box">
+                    <small>عدد الحرف التراثية</small>
+                    <h2 id="statCrafts">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h3>➕ إضافة أثر أو حرفة تراثية جديدة</h3>
+                <label>اسم الأثر أو الحرفة:</label>
+                <input type="text" id="newTitle" placeholder="مثال: صناعة الخيامية">
+                
+                <label>التصنيف:</label>
+                <select id="newCategory">
+                    <option value="monument">معلم أثري</option>
+                    <option value="craft">حرفة تراثية</option>
+                </select>
+
+                <label>المحافظة / الموقع:</label>
+                <input type="text" id="newLocation" placeholder="مثال: القاهرة التاريخية - الدرب الأحمر">
+
+                <label>العصر التاريخي:</label>
+                <input type="text" id="newEra" placeholder="مثال: العصر المملوكي / الدولة القديمة">
+
+                <label>القصة والوصف (يُقرأ صوتياً للزوار):</label>
+                <textarea id="newDesc" rows="3" placeholder="اكتب نبذة تاريخية مبسطة..."></textarea>
+
+                <button type="button" class="btn-gold" onclick="addNewItem()">حفظ في قاعدة البيانات</button>
+            </div>
+
+            <div class="card">
+                <h3>📋 إدارة المحتوى المسجل</h3>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الاسم</th>
+                                <th>التصنيف</th>
+                                <th>الموقع</th>
+                                <th>إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // 1. قاعدة البيانات المبدئية (بيانات حقيقية عن التراث المصري)
+    const defaultData = [
+        {
+            id: 1,
+            title: "معبد الكرنك",
+            category: "monument",
+            location: "الأقصر",
+            era: "الدولة الوسطى والحديثة",
+            desc: "أكبر دار عبادة دينية في العالم القديم، استمر بناؤه لأكثر من ألفي عام ويتميز بصالة الأعمدة الكبرى التي تضم 134 عموداً عملاقاً."
+        },
+        {
+            id: 2,
+            title: "حرفة الخيامية",
+            category: "craft",
+            location: "شارع الخيامية - القاهرة",
+            era: "العصر الفاطمي والمملوكي",
+            desc: "فن تطريز الأقمشة الملونة يدوياً بأشكال هندسية وزخارف إسلامية وفرعونية دقيقة، وتشتهر به منطقة باب زويلة بالقاهرة."
+        },
+        {
+            id: 3,
+            title: "قرية تونس لصناعة الفخار",
+            category: "craft",
+            location: "الفيوم",
+            era: "تراث معاصر مستمد من الفنون القديمة",
+            desc: "تشتهر قرية تونس المطلة على بحيرة قارون بصناعة الخزف والفخار اليدوي المستوحى من الطبيعة المصرية والطيور."
+        },
+        {
+            id: 4,
+            title: "مكتبة الإسكندرية القديمة والحديثة",
+            category: "monument",
+            location: "الإسكندرية",
+            era: "العصر البطلمي / الحديث",
