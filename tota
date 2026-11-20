@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حكاية أثر | الهوية المصرية والسياحة التفاعلية</title>
+<style>
+  body { font-family: Tahoma, Arial, sans-serif; margin: 0; background: #f9f5eb; color: #2c2c2c; }
+  header { background: #1a2a44; color: #fff; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #c59b27; }
+  header h1 { margin: 0; font-size: 1.4rem; color: #c59b27; }
+  .container { max-width: 1050px; margin: 20px auto; padding: 0 15px; }
+  .card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+  input, select, textarea, button { width: 100%; padding: 11px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; box-sizing: border-box; }
+  button { background: #1a2a44; color: #fff; border: none; cursor: pointer; font-weight: bold; }
+  button:hover { opacity: 0.9; }
+  .btn-gold { background: #c59b27; color: #1a2a44; }
+  .btn-terra { background: #b85d3b; color: #fff; }
+  .btn-red { background: #c0392b; color: #fff; width: auto; padding: 6px 14px; }
+  .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+  .tabs button { width: auto; padding: 10px 20px; }
+  .item-card { border: 1px solid #e6dcc8; border-radius: 10px; padding: 15px; background: #fffdf9; display: flex; flex-direction: column; justify-content: space-between; }
+  .tag { display: inline-block; padding: 4px 10px; border-radius: 15px; font-size: 0.8rem; background: #f0e6d2; color: #1a2a44; font-weight: bold; margin-bottom: 8px; }
+  .stat { text-align: center; padding: 15px; border-radius: 10px; background: #f4efe4; border-bottom: 4px solid #c59b27; }
+  .stat h2 { margin: 5px 0; color: #1a2a44; }
+  .quiz-btn { text-align: right; background: #f4f6f9; color: #222; border: 1px solid #ccc; margin: 6px 0; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: right; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🏛️ حكاية أثر (Hekayet Athar)</h1>
+    <small>منصة رقمية لاستكشاف الهوية المصرية والحرف التراثية</small>
+  </div>
+  <div id="userBar" class="hidden">
+    <span id="userLabel" style="margin-left:10px; font-weight:bold;"></span>
+    <button type="button" class="btn-red" id="logoutBtn">خروج</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- شاشة الدخول -->
+  <div id="loginBox" class="card" style="max-width:450px; margin:40px auto;">
+    <h2 style="text-align:center; color:#1a2a44;">تسجيل الدخول للمنصة</h2>
+    <label>الاسم بالكامل:</label>
+    <input type="text" id="nameInput" value="تسنيم محمود">
+    <label>نوع الحساب (الصلاحية):</label>
+    <select id="roleInput">
+      <option value="visitor">زائر / مستكشف (Visitor)</option>
+      <option value="admin">مدير المحتوى والأرشيف (Admin)</option>
+    </select>
+    <button type="button" class="btn-gold" id="startBtn">ابدأ الرحلة</button>
+  </div>
+
+  <!-- شاشة الزائر -->
+  <div id="visitorBox" class="hidden">
+    <div class="tabs">
+      <button type="button" id="tabExploreBtn">🗺️ استكشف الآثار والحرف</button>
+      <button type="button" class="btn-terra" id="tabQuizBtn">🎯 اختبر معلوماتك</button>
+    </div>
+
+    <div id="exploreView" class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <h3>🔍 دليل المعالم والحرف التراثية في مصر</h3>
+        <select id="filterSelect" style="width:auto; min-width:190px;">
+          <option value="all">عرض الكل</option>
+          <option value="monument">معالم أثرية</option>
+          <option value="craft">حرف تراثية يدوية</option>
+        </select>
+      </div>
+      <div id="cardsGrid" class="grid" style="margin-top:15px;"></div>
+    </div>
+
+    <div id="quizView" class="card hidden">
+      <h3>🎯 تحدي الهوية المصرية</h3>
+      <div id="quizBox"></div>
+      <div id="quizScore" class="hidden" style="margin-top:15px; padding:15px; background:#d4edda; border-radius:8px; font-weight:bold;"></div>
+    </div>
+  </div>
+
+  <!-- شاشة المدير -->
+  <div id="adminBox" class="hidden">
+    <div class="card">
+      <h3>🛠️ لوحة تحكم مدير الأرشيف (Admin)</h3>
+      <div class="grid">
+        <div class="stat"><small>إجمالي العناصر</small><h2 id="totalCount">0</h2></div>
+        <div class="stat"><small>المعالم الأثرية</small><h2 id="monumentCount">0</h2></div>
+        <div class="stat"><small>الحرف التراثية</small><h2 id="craftCount">0</h2></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>➕ إضافة أثر أو حرفة جديدة</h3>
+        <input type="text" id="addTitle" placeholder="اسم الأثر أو الحرفة (مثال: صناعة الخيامية)">
+        <select id="addCat">
+          <option value="monument">معلم أثري</option>
+          <option value="craft">حرفة تراثية</option>
+        </select>
+        <input type="text" id="addLoc" placeholder="المحافظة / الموقع (مثال: القاهرة)">
+        <textarea id="addDesc" rows="3" placeholder="نبذة مختصرة تقرأ صوتياً..."></textarea>
+        <button type="button" class="btn-gold" id="saveItemBtn">حفظ في قاعدة البيانات</button>
+      </div>
+
+      <div class="card">
+        <h3>📋 المحتوى المسجل</h3>
+        <table>
+          <thead><tr><th>الاسم</th><th>النوع</th><th>الموقع</th><th>حذف</th></tr></thead>
+          <tbody id="adminTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  var initialData = [
+    { id: 1, title: "معبد الكرنك", cat: "monument", loc: "الأقصر", desc: "أكبر دار عبادة دينية في العالم القديم ويتميز بصالة الأعمدة الكبرى التي تضم 134 عموداً." },
+    { id: 2, title: "حرفة الخيامية", cat: "craft", loc: "القاهرة التاريخية", desc: "فن تطريز الأقمشة الملونة يدوياً بزخارف إسلامية وفرعونية دقيقة قرب باب زويلة." },
+    { id: 3, title: "فخار قرية تونس", cat: "craft", loc: "الفيوم", desc: "صناعة الخزف والفخار اليدوي المستوحى من الطبيعة المصرية على ضفاف بحيرة قارون." },
+    { id: 4, title: "مكتبة الإسكندرية", cat: "monument", loc: "الإسكندرية", desc: "منارة العلم والمعرفة في العالم القديم وصرح ثقافي ورقمي عالمي حديث." }
+  ];
+
+  var questions = [
+    { q: "أين تقع قرية تونس الشهيرة بصناعة الفخار اليدوي؟", opts: ["أسوان", "الفيوم", "الإسكندرية"], ans: 1 },
+    { q: "كم عدد الأعمدة في صالة الأعمدة الكبرى بمعبد الكرنك؟", opts: ["134 عموداً", "50 عموداً", "200 عمود"], ans: 0 },
+    { q: "ما الحرفة التي يشتهر بها شارع تاريخي قرب باب زويلة بالقاهرة؟", opts: ["صناعة الزجاج", "حرفة الخيامية", "نحت الجرانيت"], ans: 1 }
+  ];
+
+  var db = initialData.slice();
+  try {
+    var saved = localStorage.getItem("athar_db_v2");
+    if (saved) db = JSON.parse(saved);
+  } catch (e) {}
+
+  function syncDB() {
+    try { localStorage.setItem("athar_db_v2", JSON.stringify(db)); } catch (e) {}
+  }
+
+  document.getElementById("startBtn").onclick = function() {
+    var name = document.getElementById("nameInput").value.trim() || "زائر";
+    var role = document.getElementById("roleInput").value;
+    document.getElementById("loginBox").className = "hidden";
+    document.getElementById("userBar").className = "";
+    document.getElementById("userLabel").innerText = name + (role === "admin" ? " (مدير)" : " (مستكشف)");
+    if (role === "visitor") {
+      document.getElementById("visitorBox").className = "";
+      renderCards();
+      buildQuiz();
+    } else {
+      document.getElementById("adminBox").className = "";
+      renderAdmin();
+    }
+  };
+
+  document.getElementById("logoutBtn").onclick = function() {
+    location.reload();
+  };
+
+  document.getElementById("tabExploreBtn").onclick = function() {
+    document.getElementById("exploreView").className = "card";
+    document.getElementById("quizView").className = "card hidden";
+  };
+
+  document.getElementById("tabQuizBtn").onclick = function() {
+    document.getElementById("exploreView").className = "card hidden";
+    document.getElementById("quizView").className = "card";
+  };
+
+  document.getElementById("filterSelect").onchange = renderCards;
+
+  function renderCards() {
+    var filter = document.getElementById("filterSelect").value;
+    var grid = document.getElementById("cardsGrid");
+    grid.innerHTML = "";
+    for (var i = 0; i < db.length; i++) {
+      var item = db[i];
+      if (filter !== "all" && item.cat !== filter) continue;
+      var card = document.createElement("div");
+      card.className = "item-card";
+      card.innerHTML = '<div><span class="tag">' + (item.cat === "monument" ? "🏛️ معلم أثري" : "🧶 حرفة تراثية") + '</span>' +
+        '<h4>' + item.title + '</h4><small>📍 ' + item.loc + '</small><p>' + item.desc + '</p></div>';
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn-gold";
+      btn.innerText = "🔊 استمع للقصة";
+      btn.setAttribute("data-text", item.title + ". " + item.desc);
+      btn.onclick = function() {
+        var txt = this.getAttribute("data-text");
+        if ("speechSynthesis" in window) {
+          window.speechSynthesis.cancel();
+          var u = new SpeechSynthesisUtterance(txt);
+          u.lang = "ar-SA";
+          window.speechSynthesis.speak(u);
+        } else {
+          alert(txt);
+        }
+      };
+      card.appendChild(btn);
+      grid.appendChild(card);
+    }
+  }
+
+  function buildQuiz() {
+    var box = document.getElementById("quizBox");
+    box.innerHTML = "";
+    var score = 0, count = 0;
+    for (var i = 0; i < questions.length; i++) {
+      (function(qObj) {
+        var wrap = document.createElement("div");
+        wrap.style.marginBottom = "15px";
+        wrap.innerHTML = "<strong>" + qObj.q + "</strong>";
+        var done = false;
+        for (var j = 0; j < qObj.opts.length; j++) {
+          (function(idx, optText) {
+            var b = document.createElement("button");
